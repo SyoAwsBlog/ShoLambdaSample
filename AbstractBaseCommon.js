@@ -1,19 +1,35 @@
+/*
+基底処理の枠組みとして必要そうな処理を実装する
+・ログのレベル毎出力
+・Promiseの順次処理ハンドリング
+・エラー発生時の自動再実行
+・業務例外（Lambda関数のエラーとしない例外）
+
+written by syo
+http://awsblog.physalisgp02.com
+*/
 module.exports = function AbstractBaseCommon() {
+  // aa のPromiseをグローバル変数へ
   var Promise;
+  // aa をグローバル変数へ
   var aa;
+  // AWS SDK をグローバル変数へ
   var Aws;
 
+  // 各ログレベルの宣言
   var LOG_LEVEL_TRACE = 1;
   var LOG_LEVEL_DEBUG = 2;
   var LOG_LEVEL_INFO = 3;
   var LOG_LEVEL_WARN = 4;
   var LOG_LEVEL_ERROR = 5;
 
+  // 現在の出力レベルを設定
   var LOG_LEVEL_CURRENT = LOG_LEVEL_INFO;
   if (process && process.env && process.env.LogLevel) {
     LOG_LEVEL_CURRENT = process.env.LogLevel;
   }
 
+  // 業務用例外の宣言
   function BizError(err, message) {
     this.name = "WarnInterruption";
     this.message = message || "SequenceTasks Interruption";
@@ -22,10 +38,12 @@ module.exports = function AbstractBaseCommon() {
   BizError.prototype = Object.create(Error.prototype);
   BizError.prototype.constructor = BizError;
 
+  // 現在のログレベルの値を返却する
   AbstractBaseCommon.prototype.getLogLevelCurrent = function () {
     return LOG_LEVEL_CURRENT;
   }.bind(AbstractBaseCommon.prototype);
 
+  // 定数としての各ログレベルを返却する
   AbstractBaseCommon.prototype.getLogLevelTrace = function () {
     return LOG_LEVEL_TRACE;
   }.bind(AbstractBaseCommon.prototype);
@@ -42,6 +60,11 @@ module.exports = function AbstractBaseCommon() {
     return LOG_LEVEL_ERROR;
   }.bind(AbstractBaseCommon.prototype);
 
+  /*
+  業務例外以外のエラー情報を出力する  
+
+  @param err Errorオブジェクト
+  */
   AbstractBaseCommon.prototype.printStackTrace = function (err) {
     if (this.getLogLevelError() >= this.getLogLevelCurrent()) {
       if (err instanceof BizError) {
@@ -57,6 +80,12 @@ module.exports = function AbstractBaseCommon() {
     }
   }.bind(AbstractBaseCommon.prototype);
 
+  /*
+  業務例外かどうか判定する
+
+  @param err Errorオブジェクト
+  @return true:業務例外・false:例外
+  */
   AbstractBaseCommon.prototype.judgeBizError = function (err) {
     var rtnFlag = false;
     if (err instanceof BizError) {
@@ -69,10 +98,22 @@ module.exports = function AbstractBaseCommon() {
     return rtnFlag;
   }.bind(AbstractBaseCommon.prototype);
 
+  /*
+  業務例外を取得する（エラーオブジェクトをラップして業務例外にする）
+
+  @param err エラーオブジェクト
+  @param message エラーメッセージ
+  */
   AbstractBaseCommon.prototype.getBizError = function (err, message) {
     return new BizError(err, message);
   }.bind(AbstractBaseCommon.prototype);
 
+  /*
+  メイン実行処理
+
+  @param event Lambdaの起動引数：event
+  @param context Lambdaの起動引数：context
+  */
   AbstractBaseCommon.prototype.executeBaseCommon = function* (event, context) {
     var currentThisClazz = this;
     try {
@@ -83,6 +124,7 @@ module.exports = function AbstractBaseCommon() {
         console.log("AbstractBaseCommon# executeBaseCommon : start");
       }
 
+      // 読み込みモジュールをグローバル変数へ
       if (currentThisClazz.RequireObjects.PromiseObject) {
         Promise = currentThisClazz.RequireObjects.PromiseObject;
       }
@@ -92,16 +134,20 @@ module.exports = function AbstractBaseCommon() {
       if (currentThisClazz.RequireObjects.Aws) {
         Aws = currentThisClazz.RequireObjects.Aws;
       }
+
+      // 各タスク処理で参照したであろう情報をクラス変数へ
       var promiseRefs = {
         event,
         context,
       };
       currentThisClazz.promiseRefs = promiseRefs;
 
+      // 処理の戻り値用にPromise外に宣言
       var bizLastVal;
 
       return yield Promise.resolve()
         .then(function () {
+          // getTasksで指定した Promise配列を取得
           var tasks = currentThisClazz.getTasks(event, context);
 
           if (
@@ -112,9 +158,12 @@ module.exports = function AbstractBaseCommon() {
               "AbstractBaseCommon# Get Tasks After Task Count:" + tasks.length
             );
           }
+
+          // 順次実行処理を実装
           return currentThisClazz.sequenceTasks(currentThisClazz, tasks, event);
         })
         .then(function (results) {
+          // 全てのタスクの後処理として実装する用に、オーバーライド用関数を呼ぶ
           bizLastVal = currentThisClazz.afterAllTasksExecute(
             event,
             context,
@@ -124,12 +173,14 @@ module.exports = function AbstractBaseCommon() {
         })
         .catch(function (err) {
           try {
+            // 処理中例外処理として何かを実装する用に、オーバーライド用関数を呼ぶ
             currentThisClazz.catchErrorAllTasksExecute(event, context, err);
           } catch (err) {
             throw err;
           }
         })
         .then(function () {
+          // finallyで通る処理を実装する用に、オーバーライド用関数を呼ぶ
           currentThisClazz.finallyAllTasksExecute(event, context);
           return bizLastVal;
         });
@@ -151,6 +202,13 @@ module.exports = function AbstractBaseCommon() {
     }
   };
 
+  /*
+  引数で受け取ったPromise配列を順次処理する
+
+  @param currentThisClazz AbstractBaseCommonの参照
+  @param tasks 実行対象のPromise配列
+  @param event Lamdbaの実行引数
+  */
   AbstractBaseCommon.prototype.sequenceTasks = function (
     currentThisClazz,
     tasks,
@@ -248,6 +306,11 @@ module.exports = function AbstractBaseCommon() {
     }
   };
 
+  /*
+  処理結果配列の最初の要素（参照）を返却する
+
+  @param args 処理結果配列
+  */
   AbstractBaseCommon.prototype.getFirstIndexObject = function (args) {
     var rtnObject = null;
     if (args && args.length > 0) {
@@ -256,6 +319,11 @@ module.exports = function AbstractBaseCommon() {
     return rtnObject;
   };
 
+  /*
+  処理結果配列の最後の要素（参照）を返却する
+
+  @param args 処理結果配列
+  */
   AbstractBaseCommon.prototype.getLastIndexObject = function (args) {
     var rtnObject = null;
     if (args && args.length > 0) {
@@ -265,6 +333,15 @@ module.exports = function AbstractBaseCommon() {
     return rtnObject;
   };
 
+  /*
+  順次処理する関数を指定する。
+  Promiseを返却すると、Promiseの終了を待った上で順次処理をする
+  
+  順次処理を増やしたい時などは、オーバーライドする事で実装する。
+
+  @param event Lambdaの起動引数：event
+  @param context Lambdaの起動引数：context
+  */
   AbstractBaseCommon.prototype.getTasks = function (event, context) {
     var currentThisClazz = this;
     try {
@@ -293,6 +370,13 @@ module.exports = function AbstractBaseCommon() {
     }
   };
 
+  /*
+  順次処理した後の全ての処理が成功した場合の後処理を実装した場合にオーバーライドする
+
+  @param event Lambdaの起動引数：event
+  @param context Lambdaの起動引数：context
+  @param results 処理結果配列
+  */
   AbstractBaseCommon.prototype.afterAllTasksExecute = function (
     event,
     context,
@@ -325,6 +409,12 @@ module.exports = function AbstractBaseCommon() {
     }
   };
 
+  /*
+  成功・失敗に関わらず順次処理の後処理を実行したい場合にオーバーライドする
+
+  @param event Lambdaの起動引数：event
+  @param context Lambdaの起動引数：context
+  */
   AbstractBaseCommon.prototype.finallyAllTasksExecute = function (
     event,
     context
@@ -355,6 +445,14 @@ module.exports = function AbstractBaseCommon() {
     }
   };
 
+  /*
+  順次処理で何かしらの例外が発生した場合の処理を実装する
+  例外が発生した場合にリトライ上限まで再実行するサンプルを実装する
+
+  @param event Lambdaの起動引数：event
+  @param context Lambdaの起動引数：context
+  @param err 発生例外
+  */
   AbstractBaseCommon.prototype.catchErrorAllTasksExecute = function (
     event,
     context,
@@ -440,6 +538,13 @@ module.exports = function AbstractBaseCommon() {
     }
   }.bind(AbstractBaseCommon.prototype);
 
+  /*
+  リトライ上限未満である場合、自Lambdaを同引数で再実行するサンプル
+
+  @param event Lambdaの起動引数：event
+  @param context Lambdaの起動引数：context
+  @param err 発生例外
+  */
   AbstractBaseCommon.prototype.autoRetryExecute = function (
     event,
     context,
