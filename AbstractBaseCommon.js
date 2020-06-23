@@ -565,8 +565,8 @@ module.exports = function AbstractBaseCommon() {
       }
 
       var autoFunctionRetryMax = 0;
-      if (process && process.env && process.env.AutoFunctionRetry) {
-        autoFunctionRetryMax = process.env.AutoFunctionRetry;
+      if (process && process.env && process.env.autoFunctionRetry) {
+        autoFunctionRetryMax = process.env.autoFunctionRetry;
       }
 
       var funcName = process.env.AWS_LAMBDA_FUNCTION_NAME;
