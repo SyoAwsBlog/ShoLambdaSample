@@ -17,9 +17,7 @@ module.exports = function SampleBizModule() {
   function* execute(event, context, bizRequireObjects) {
     var base = SampleBizModule.prototype.AbstractBaseCommon;
     try {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("SampleBizModule# execute : start");
-      }
+      base.writeLogTrace("SampleBizModule# execute : start");
 
       // 親の業務処理を実行
       return yield SampleBizModule.prototype.executeBizUnitCommon(
@@ -28,14 +26,10 @@ module.exports = function SampleBizModule() {
         bizRequireObjects
       );
     } catch (err) {
-      if (base.getLogLevelError() >= base.getLogLevelCurrent()) {
-        base.printStackTrace(err);
-      }
+      base.printStackTrace(err);
       throw err;
     } finally {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("SampleBizModule# execute : end");
-      }
+      base.writeLogTrace("SampleBizModule# execute : end");
     }
   }
 
@@ -50,9 +44,7 @@ module.exports = function SampleBizModule() {
   ) {
     var base = SampleBizModule.prototype.AbstractBaseCommon;
     try {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("SampleBizModule# businessMainExecute : start");
-      }
+      base.writeLogTrace("SampleBizModule# businessMainExecute : start");
 
       // 基底処理を実行する事で、Lambda実行引数のeventを取り出せる
       var event = base.getFirstIndexObject(args);
@@ -74,14 +66,10 @@ module.exports = function SampleBizModule() {
         resolve("businessMainExecute Finish");
       });
     } catch (err) {
-      if (base.getLogLevelError() >= base.getLogLevelCurrent()) {
-        base.printStackTrace(err);
-      }
+      base.printStackTrace(err);
       throw err;
     } finally {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("SampleBizModule# businessMainExecute : end");
-      }
+      base.writeLogTrace("SampleBizModule# businessMainExecute : end");
     }
   }.bind(SampleBizModule.prototype.AbstractBaseCommon);
 

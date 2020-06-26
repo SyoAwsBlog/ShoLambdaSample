@@ -19,9 +19,7 @@ module.exports = function AbstractBizUnitCommon() {
   function* executeBizUnitCommon(event, context, bizRequireObjects) {
     var base = AbstractBizUnitCommon.prototype.AbstractBaseCommon;
     try {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("AbstractBizUnitCommon# executeBizUnitCommon : start");
-      }
+      base.writeLogTrace("AbstractBizUnitCommon# executeBizUnitCommon : start");
 
       // 自動再実行ようの演算
       var reCallCount = event.reCallCount || 0;
@@ -38,14 +36,10 @@ module.exports = function AbstractBizUnitCommon() {
         bizRequireObjects
       );
     } catch (err) {
-      if (base.getLogLevelError() >= base.getLogLevelCurrent()) {
-        base.printStackTrace(err);
-      }
+      base.printStackTrace(err);
       throw err;
     } finally {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("AbstractBizUnitCommon# executeBizUnitCommon : end");
-      }
+      base.writeLogTrace("AbstractBizUnitCommon# executeBizUnitCommon : end");
     }
   }
   AbstractBizUnitCommon.prototype.executeBizUnitCommon = executeBizUnitCommon;
@@ -64,23 +58,18 @@ module.exports = function AbstractBizUnitCommon() {
   ) {
     var base = AbstractBizUnitCommon.prototype.AbstractBaseCommon;
     try {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("AbstractBizUnitCommon# beforeMainExecute : start");
-      }
+      base.writeLogTrace("AbstractBizUnitCommon# beforeMainExecute : start");
+
       // tasksの先頭には event が格納されてくる。
       // 後続のtaskで参照しやすくするには、最初のタスクで
       // eventを返却しておくと良い
       var event = args;
       return event;
     } catch (err) {
-      if (base.getLogLevelError() >= base.getLogLevelCurrent()) {
-        base.printStackTrace(err);
-      }
+      base.printStackTrace(err);
       throw err;
     } finally {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("AbstractBizUnitCommon# beforeMainExecute : end");
-      }
+      base.writeLogTrace("AbstractBizUnitCommon# beforeMainExecute : end");
     }
   }.bind(AbstractBizUnitCommon.prototype.AbstractBaseCommon);
 

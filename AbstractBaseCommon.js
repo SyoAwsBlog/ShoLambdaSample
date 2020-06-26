@@ -61,6 +61,39 @@ module.exports = function AbstractBaseCommon() {
   }.bind(AbstractBaseCommon.prototype);
 
   /*
+  出力レベル毎のログ処理
+  */
+  AbstractBaseCommon.prototype.writeLogTrace = function (msg) {
+    if (this.getLogLevelTrace() >= this.getLogLevelCurrent()) {
+      console.log(msg);
+    }
+  }.bind(AbstractBaseCommon.prototype);
+
+  AbstractBaseCommon.prototype.writeLogDebug = function (msg) {
+    if (this.getLogLevelDebug() >= this.getLogLevelCurrent()) {
+      console.log(msg);
+    }
+  }.bind(AbstractBaseCommon.prototype);
+
+  AbstractBaseCommon.prototype.writeLogInfo = function (msg) {
+    if (this.getLogLevelInfo() >= this.getLogLevelCurrent()) {
+      console.log(msg);
+    }
+  }.bind(AbstractBaseCommon.prototype);
+
+  AbstractBaseCommon.prototype.writeLogWarn = function (msg) {
+    if (this.getLogLevelWarn() >= this.getLogLevelCurrent()) {
+      console.log(msg);
+    }
+  }.bind(AbstractBaseCommon.prototype);
+
+  AbstractBaseCommon.prototype.writeLogError = function (msg) {
+    if (this.getLogLevelError() >= this.getLogLevelCurrent()) {
+      console.log(msg);
+    }
+  }.bind(AbstractBaseCommon.prototype);
+
+  /*
   業務例外以外のエラー情報を出力する  
 
   @param err Errorオブジェクト
@@ -117,12 +150,9 @@ module.exports = function AbstractBaseCommon() {
   AbstractBaseCommon.prototype.executeBaseCommon = function* (event, context) {
     var currentThisClazz = this;
     try {
-      if (
-        currentThisClazz.getLogLevelTrace() >=
-        currentThisClazz.getLogLevelCurrent()
-      ) {
-        console.log("AbstractBaseCommon# executeBaseCommon : start");
-      }
+      currentThisClazz.writeLogTrace(
+        "AbstractBaseCommon# executeBaseCommon : start"
+      );
 
       // 読み込みモジュールをグローバル変数へ
       if (currentThisClazz.RequireObjects.PromiseObject) {
@@ -150,14 +180,9 @@ module.exports = function AbstractBaseCommon() {
           // getTasksで指定した Promise配列を取得
           var tasks = currentThisClazz.getTasks(event, context);
 
-          if (
-            currentThisClazz.getLogLevelDebug >=
-            currentThisClazz.getLogLevelCurrent()
-          ) {
-            console.log(
-              "AbstractBaseCommon# Get Tasks After Task Count:" + tasks.length
-            );
-          }
+          currentThisClazz.writeLogDebug(
+            "AbstractBaseCommon# Get Tasks After Task Count:" + tasks.length
+          );
 
           // 順次実行処理を実装
           return currentThisClazz.sequenceTasks(currentThisClazz, tasks, event);
@@ -185,20 +210,12 @@ module.exports = function AbstractBaseCommon() {
           return bizLastVal;
         });
     } catch (err) {
-      if (
-        currentThisClazz.getLogLevelError() >=
-        currentThisClazz.getLogLevelCurrent()
-      ) {
-        currentThisClazz.printStackTrace(err);
-      }
+      currentThisClazz.printStackTrace(err);
       throw err;
     } finally {
-      if (
-        currentThisClazz.getLogLevelTrace() >=
-        currentThisClazz.getLogLevelCurrent()
-      ) {
-        console.log("AbstractBaseCommon# executeBaseCommon : end");
-      }
+      currentThisClazz.writeLogTrace(
+        "AbstractBaseCommon# executeBaseCommon : end"
+      );
     }
   };
 
@@ -215,12 +232,9 @@ module.exports = function AbstractBaseCommon() {
     event
   ) {
     try {
-      if (
-        currentThisClazz.getLogLevelTrace() >=
-        currentThisClazz.getLogLevelCurrent()
-      ) {
-        console.log("AbstractBaseCommon# sequenceTasks : start");
-      }
+      currentThisClazz.writeLogTrace(
+        "AbstractBaseCommon# sequenceTasks : start"
+      );
 
       return new Promise(function (resolve, reject) {
         function* controler() {
@@ -289,20 +303,10 @@ module.exports = function AbstractBaseCommon() {
           });
       });
     } catch (err) {
-      if (
-        currentThisClazz.getLogLevelError() >=
-        currentThisClazz.getLogLevelCurrent()
-      ) {
-        currentThisClazz.printStackTrace(err);
-      }
+      currentThisClazz.printStackTrace(err);
       throw err;
     } finally {
-      if (
-        currentThisClazz.getLogLevelTrace() >=
-        currentThisClazz.getLogLevelCurrent()
-      ) {
-        console.log("AbstractBaseCommon# sequenceTasks : end");
-      }
+      currentThisClazz.writeLogTrace("AbstractBaseCommon# sequenceTasks : end");
     }
   };
 
@@ -345,20 +349,10 @@ module.exports = function AbstractBaseCommon() {
   AbstractBaseCommon.prototype.getTasks = function (event, context) {
     var currentThisClazz = this;
     try {
-      if (
-        currentThisClazz.getLogLevelTrace() >=
-        currentThisClazz.getLogLevelCurrent()
-      ) {
-        console.log("AbstractBaseCommon# getTasks : start");
-      }
+      currentThisClazz.writeLogTrace("AbstractBaseCommon# getTasks : start");
       return [];
     } catch (err) {
-      if (
-        currentThisClazz.getLogLevelError() >=
-        currentThisClazz.getLogLevelCurrent()
-      ) {
-        currentThisClazz.printStackTrace(err);
-      }
+      currentThisClazz.printStackTrace(err);
       throw err;
     } finally {
       if (
@@ -384,28 +378,17 @@ module.exports = function AbstractBaseCommon() {
   ) {
     var currentThisClazz = this;
     try {
-      if (
-        currentThisClazz.getLogLevelTrace() >=
-        currentThisClazz.getLogLevelCurrent()
-      ) {
-        console.log("AbstractBaseCommon# afterAllTasksExecute : start");
-      }
+      currentThisClazz.writeLogTrace(
+        "AbstractBaseCommon# afterAllTasksExecute : start"
+      );
       return "AbstractBaseCommon# afterAllTasksExecute:Finish";
     } catch (err) {
-      if (
-        currentThisClazz.getLogLevelError() >=
-        currentThisClazz.getLogLevelCurrent()
-      ) {
-        currentThisClazz.printStackTrace(err);
-      }
+      currentThisClazz.printStackTrace(err);
       throw err;
     } finally {
-      if (
-        currentThisClazz.getLogLevelTrace() >=
-        currentThisClazz.getLogLevelCurrent()
-      ) {
-        console.log("AbstractBaseCommon# afterAllTasksExecute : end");
-      }
+      currentThisClazz.writeLogTrace(
+        "AbstractBaseCommon# afterAllTasksExecute : end"
+      );
     }
   };
 
@@ -421,27 +404,16 @@ module.exports = function AbstractBaseCommon() {
   ) {
     var currentThisClazz = this;
     try {
-      if (
-        currentThisClazz.getLogLevelTrace() >=
-        currentThisClazz.getLogLevelCurrent()
-      ) {
-        console.log("AbstractBaseCommon# finallyAllTasksExecute : start");
-      }
+      currentThisClazz.writeLogTrace(
+        "AbstractBaseCommon# finallyAllTasksExecute : start"
+      );
     } catch (err) {
-      if (
-        currentThisClazz.getLogLevelError() >=
-        currentThisClazz.getLogLevelCurrent()
-      ) {
-        currentThisClazz.printStackTrace(err);
-      }
+      currentThisClazz.printStackTrace(err);
       throw err;
     } finally {
-      if (
-        currentThisClazz.getLogLevelTrace() >=
-        currentThisClazz.getLogLevelCurrent()
-      ) {
-        console.log("AbstractBaseCommon# finallyAllTasksExecute : end");
-      }
+      currentThisClazz.writeLogTrace(
+        "AbstractBaseCommon# finallyAllTasksExecute : end"
+      );
     }
   };
 
@@ -460,20 +432,15 @@ module.exports = function AbstractBaseCommon() {
   ) {
     var currentThisClazz = this;
     try {
-      if (
-        currentThisClazz.getLogLevelTrace() >=
-        currentThisClazz.getLogLevelCurrent()
-      ) {
-        console.log("AbstractBaseCommon# catchErrorAllTasksExecute : start");
-      }
+      currentThisClazz.writeLogTrace(
+        "AbstractBaseCommon# catchErrorAllTasksExecute : start"
+      );
 
       if (
         currentThisClazz.getLogLevelError() >=
         currentThisClazz.getLogLevelCurrent()
       ) {
         if (err) {
-          console.log(JSON.stringify(err));
-
           if (err instanceof BizError) {
             console.log(err.message);
           } else if (err && err.name && err.name == "WarnInterruption") {
@@ -486,55 +453,44 @@ module.exports = function AbstractBaseCommon() {
             console.log(err.message);
           } else {
             currentThisClazz.printStackTrace(err);
-
-            var bizAutoRetryCount = 0;
-            if (event && event.bizAutoRetryCount) {
-              bizAutoRetryCount = event.bizAutoRetryCount;
-            }
-
-            var autoFunctionRetryMax = 0;
-            if (process && process.env && process.env.autoFunctionRetry) {
-              autoFunctionRetryMax = process.env.autoFunctionRetry;
-            }
-
-            if (bizAutoRetryCount < autoFunctionRetryMax) {
-              if (
-                currentThisClazz.getLogLevelWarn >=
-                currentThisClazz.getLogLevelCurrent()
-              ) {
-                console.log(
-                  "AbstractBaseCommon# autoRetryExecute bizAutoRetryCount:" +
-                    bizAutoRetryCount +
-                    " autoFunctionRetryMax:" +
-                    autoFunctionRetryMax
-                );
-              }
-
-              bizAutoRetryCount = bizAutoRetryCount + 1;
-              event.bizAutoRetryCount = bizAutoRetryCount;
-
-              currentThisClazz.autoRetryExecute(event, context, err);
-            } else {
-              throw err;
-            }
           }
         }
       }
-    } catch (err) {
-      if (
-        currentThisClazz.getLogLevelError() >=
-        currentThisClazz.getLogLevelCurrent()
-      ) {
-        currentThisClazz.printStackTrace(err);
+
+      if (err && !currentThisClazz.judgeBizError(err)) {
+        var bizAutoRetryCount = 0;
+        if (event && event.bizAutoRetryCount) {
+          bizAutoRetryCount = event.bizAutoRetryCount;
+        }
+
+        var autoFunctionRetryMax = 0;
+        if (process && process.env && process.env.autoFunctionRetry) {
+          autoFunctionRetryMax = process.env.autoFunctionRetry;
+        }
+
+        if (bizAutoRetryCount < autoFunctionRetryMax) {
+          currentThisClazz.writeLogWarn(
+            "AbstractBaseCommon# autoRetryExecute bizAutoRetryCount:" +
+              bizAutoRetryCount +
+              " autoFunctionRetryMax:" +
+              autoFunctionRetryMax
+          );
+
+          bizAutoRetryCount = bizAutoRetryCount + 1;
+          event.bizAutoRetryCount = bizAutoRetryCount;
+
+          currentThisClazz.autoRetryExecute(event, context, err);
+        } else {
+          throw err;
+        }
       }
+    } catch (err) {
+      currentThisClazz.printStackTrace(err);
       throw err;
     } finally {
-      if (
-        currentThisClazz.getLogLevelTrace() >=
-        currentThisClazz.getLogLevelCurrent()
-      ) {
-        console.log("AbstractBaseCommon# catchErrorAllTasksExecute : end");
-      }
+      currentThisClazz.writeLogTrace(
+        "AbstractBaseCommon# catchErrorAllTasksExecute : end"
+      );
     }
   }.bind(AbstractBaseCommon.prototype);
 
@@ -552,12 +508,9 @@ module.exports = function AbstractBaseCommon() {
   ) {
     var currentThisClazz = this;
     try {
-      if (
-        currentThisClazz.getLogLevelTrace() >=
-        currentThisClazz.getLogLevelCurrent()
-      ) {
-        console.log("AbstractBaseCommon# autoRetryExecute : start");
-      }
+      currentThisClazz.writeLogTrace(
+        "AbstractBaseCommon# autoRetryExecute : start"
+      );
 
       var autoFunctionRetryWait = 500;
       if (process && process.env && process.env.AutoFunctionRetryWait) {
@@ -623,20 +576,12 @@ module.exports = function AbstractBaseCommon() {
           // リトライ中にエラーが出てもスローしない
         });
     } catch (err) {
-      if (
-        currentThisClazz.getLogLevelError() >=
-        currentThisClazz.getLogLevelCurrent()
-      ) {
-        currentThisClazz.printStackTrace(err);
-      }
+      currentThisClazz.printStackTrace(err);
       throw err;
     } finally {
-      if (
-        currentThisClazz.getLogLevelTrace() >=
-        currentThisClazz.getLogLevelCurrent()
-      ) {
-        console.log("AbstractBaseCommon# autoRetryExecute : end");
-      }
+      currentThisClazz.writeLogTrace(
+        "AbstractBaseCommon# autoRetryExecute : end"
+      );
     }
   }.bind(AbstractBaseCommon.prototype);
 };

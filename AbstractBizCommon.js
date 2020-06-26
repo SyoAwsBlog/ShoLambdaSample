@@ -20,9 +20,7 @@ module.exports = function AbstractBizCommon() {
   function* executeBizCommon(event, context, bizRequireObjects) {
     var base = AbstractBizCommon.prototype;
     try {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("AbstractBizCommon# executeBizCommon : start");
-      }
+      base.writeLogTrace("AbstractBizCommon# executeBizCommon : start");
 
       if (bizRequireObjects.PromiseObject) {
         Promise = bizRequireObjects.PromiseObject;
@@ -38,14 +36,10 @@ module.exports = function AbstractBizCommon() {
         bizRequireObjects
       );
     } catch (err) {
-      if (base.getLogLevelError() >= base.getLogLevelCurrent()) {
-        base.printStackTrace(err);
-      }
+      base.printStackTrace(err);
       throw err;
     } finally {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("AbstractBizCommon# executeBizCommon : end");
-      }
+      base.writeLogTrace("AbstractBizCommon# executeBizCommon : end");
     }
   }
   AbstractBizCommon.prototype.executeBizCommon = executeBizCommon;
@@ -59,9 +53,7 @@ module.exports = function AbstractBizCommon() {
   AbstractBizCommon.prototype.getCurrentDate = function (offset) {
     var base = AbstractBizCommon.prototype;
     try {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("AbstractBizCommon# getCurrentDate : start");
-      }
+      base.writeLogTrace("AbstractBizCommon# getCurrentDate : start");
 
       Date.prototype.setTimezone = function (tz) {
         var utc = new Date(
@@ -79,14 +71,10 @@ module.exports = function AbstractBizCommon() {
 
       return now;
     } catch (err) {
-      if (base.getLogLevelError() >= base.getLogLevelCurrent()) {
-        base.printStackTrace(err);
-      }
+      base.printStackTrace(err);
       throw err;
     } finally {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("AbstractBizCommon# getCurrentDate : end");
-      }
+      base.writeLogTrace("AbstractBizCommon# getCurrentDate : end");
     }
   };
 
@@ -98,9 +86,7 @@ module.exports = function AbstractBizCommon() {
   AbstractBizCommon.prototype.getTimeStringJst9 = function (now) {
     var base = AbstractBizCommon.prototype;
     try {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("AbstractBizCommon# getTimeStringJst9 : start");
-      }
+      base.writeLogTrace("AbstractBizCommon# getTimeStringJst9 : start");
 
       var year = now.getYear();
       var month = ("0" + (now.getMonth() + 1)).slice(-2);
@@ -132,14 +118,10 @@ module.exports = function AbstractBizCommon() {
 
       return now;
     } catch (err) {
-      if (base.getLogLevelError() >= base.getLogLevelCurrent()) {
-        base.printStackTrace(err);
-      }
+      base.printStackTrace(err);
       throw err;
     } finally {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("AbstractBizCommon# getTimeStringJst9 : end");
-      }
+      base.writeLogTrace("AbstractBizCommon# getTimeStringJst9 : end");
     }
   };
 
@@ -152,22 +134,16 @@ module.exports = function AbstractBizCommon() {
   AbstractBizCommon.prototype.beforeMainExecute = function (args) {
     var base = AbstractBizCommon.prototype;
     try {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("AbstractBizCommon# beforeMainExecute :start");
-      }
+      base.writeLogTrace("AbstractBizCommon# beforeMainExecute :start");
 
       return new Promise(function (resolve, reject) {
         resolve("beforeMainExecute Finish");
       });
     } catch (err) {
-      if (base.getLogLevelError() >= base.getLogLevelCurrent()) {
-        base.printStackTrace(err);
-      }
+      base.printStackTrace(err);
       throw err;
     } finally {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("AbstractBizCommon# beforeMainExecute :end");
-      }
+      base.writeLogTrace("AbstractBizCommon# beforeMainExecute :end");
     }
   };
 
@@ -180,9 +156,7 @@ module.exports = function AbstractBizCommon() {
   AbstractBizCommon.prototype.businessMainExecute = function (args) {
     var base = AbstractBizCommon.prototype;
     try {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("AbstractBizCommon# businessMainExecute :start");
-      }
+      base.writeLogTrace("AbstractBizCommon# businessMainExecute :start");
 
       return new Promise(function (resolve, reject) {
         resolve("businessMainExecute Finish");
@@ -193,9 +167,7 @@ module.exports = function AbstractBizCommon() {
       }
       throw err;
     } finally {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("AbstractBizCommon# businessMainExecute :end");
-      }
+      base.writeLogTrace("AbstractBizCommon# businessMainExecute :end");
     }
   };
 
@@ -208,22 +180,16 @@ module.exports = function AbstractBizCommon() {
   AbstractBizCommon.prototype.afterMainExecute = function (args) {
     var base = AbstractBizCommon.prototype;
     try {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("AbstractBizCommon# afterMainExecute :start");
-      }
+      base.writeLogTrace("AbstractBizCommon# afterMainExecute :start");
 
       return new Promise(function (resolve, reject) {
         resolve("afterMainExecute Finish");
       });
     } catch (err) {
-      if (base.getLogLevelError() >= base.getLogLevelCurrent()) {
-        base.printStackTrace(err);
-      }
+      base.printStackTrace(err);
       throw err;
     } finally {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("AbstractBizCommon# afterMainExecute :end");
-      }
+      base.writeLogTrace("AbstractBizCommon# afterMainExecute :end");
     }
   };
 
@@ -239,9 +205,7 @@ module.exports = function AbstractBizCommon() {
   AbstractBizCommon.prototype.getTasks = function (event, context) {
     var base = AbstractBizCommon.prototype;
     try {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("AbstractBizCommon# getTasks :start");
-      }
+      base.writeLogTrace("AbstractBizCommon# getTasks :start");
 
       return [
         this.beforeMainExecute,
@@ -249,14 +213,10 @@ module.exports = function AbstractBizCommon() {
         this.afterMainExecute,
       ];
     } catch (err) {
-      if (base.getLogLevelError() >= base.getLogLevelCurrent()) {
-        base.printStackTrace(err);
-      }
+      base.printStackTrace(err);
       throw err;
     } finally {
-      if (base.getLogLevelTrace() >= base.getLogLevelCurrent()) {
-        console.log("AbstractBizCommon# getTasks :end");
-      }
+      base.writeLogTrace("AbstractBizCommon# getTasks :end");
     }
   };
 
